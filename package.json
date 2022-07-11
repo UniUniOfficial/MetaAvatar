@@ -1,0 +1,16 @@
+{
+  "name": "avatar",
+  "version": "1.0.0",
+  "scripts": {
+    "compile": "truffle compile",
+    "migrate": "truffle migrate",
+    "test": "truffle test",
+    "flatten": "./flatten.sh"
+  },
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "@openzeppelin/contracts": "^4.7.0",
+    "truffle-flattener": "^1.6.0"
+  }
+}
