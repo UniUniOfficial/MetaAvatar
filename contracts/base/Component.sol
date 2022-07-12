@@ -7,11 +7,10 @@ import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
 import "@openzeppelin/contracts/utils/cryptography/draft-EIP712.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
-import "@openzeppelin//contracts/security/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 
 
-abstract contract Component is ERC721, ERC721Enumerable, EIP712, Ownable, ReentrancyGuard {
+abstract contract Component is ERC721, ERC721Enumerable, EIP712, Ownable {
     using Counters for Counters.Counter;
     Counters.Counter private _tokenIdCounter;
 
@@ -41,9 +40,9 @@ abstract contract Component is ERC721, ERC721Enumerable, EIP712, Ownable, Reentr
         _safeMint(to, tokenId);
     }
 
-    function mintPublic(address to) external payable nonReentrant {
+    function mintPublic(address to) external payable {
         if (acceptToken == address(0)) {
-            require(msg.value == mintPrice, "Mint: not enough coin to mint");
+            require(msg.value == mintPrice, "Mint: Not enough payment to mint");
         } else {
             IERC20(acceptToken).transfer(address(this), mintPrice);
         }
@@ -54,7 +53,7 @@ abstract contract Component is ERC721, ERC721Enumerable, EIP712, Ownable, Reentr
     }
 
     function airdrop(address to, uint256 tokenId, bytes calldata signature) external {
-        require(_verify(_hash(to, tokenId), signature), "Invalid signature");
+        require(_verify(_hash(to, tokenId), signature), "Airdrop: Invalid signature");
         _safeMint(to, tokenId);
     }
 
@@ -67,7 +66,7 @@ abstract contract Component is ERC721, ERC721Enumerable, EIP712, Ownable, Reentr
     }
 
     function withdraw(address withdrawAddress) external onlyOwner {
-        require(withdrawAddress != address(0), "No withdraw address");
+        require(withdrawAddress != address(0), "Withdraw: No withdraw address");
         if (acceptToken == address(0)) {
             payable(withdrawAddress).transfer(address(this).balance);
         } else {
@@ -94,8 +93,8 @@ abstract contract Component is ERC721, ERC721Enumerable, EIP712, Ownable, Reentr
      * @dev Override the logic that limit the NFTs totally to max supply
      */
     function _safeMint(address to, uint256 tokenId) internal override virtual {
-        require(mintPermitted, "No NFT is allowed to mint");
-        require(tokenId <= maxSupply, "NFTs are reached to max supply limit");
+        require(mintPermitted, "Mint: No NFT is allowed to mint");
+        require(tokenId <= maxSupply, "Mint: total supply of NFTs is reached to max supply limit");
         super._safeMint(to, tokenId);
     }
 
