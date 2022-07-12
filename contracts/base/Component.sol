@@ -58,6 +58,26 @@ abstract contract Component is ERC721, ERC721Enumerable, EIP712, Ownable, Reentr
         _safeMint(to, tokenId);
     }
 
+    /**
+     * @dev after the call, no NFT is allowed to mint, and max supply is also determinate
+     */
+    function stopMint() external onlyOwner {
+        mintPermitted = false;
+        maxSupply = totalSupply();
+    }
+
+    function withdraw(address withdrawAddress) external onlyOwner {
+        require(withdrawAddress != address(0), "No withdraw address");
+        if (acceptToken == address(0)) {
+            payable(withdrawAddress).transfer(address(this).balance);
+        } else {
+            IERC20(acceptToken).transfer(
+                withdrawAddress, 
+                IERC20(acceptToken).balanceOf(address(this))
+            );
+        }
+    }
+
     function _hash(address to, uint256 tokenId) internal view returns (bytes32) {
         return _hashTypedDataV4(keccak256(abi.encode(
             keccak256("Airdrop(address account, uint256 tokenId)"),
@@ -68,11 +88,6 @@ abstract contract Component is ERC721, ERC721Enumerable, EIP712, Ownable, Reentr
 
     function _verify(bytes32 digest, bytes memory signature) internal view returns (bool) {
         return owner() == ECDSA.recover(digest, signature);
-    }
-
-    function stopMint() external onlyOwner {
-        mintPermitted = false;
-        maxSupply = totalSupply();
     }
 
     /**
