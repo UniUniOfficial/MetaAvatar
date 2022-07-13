@@ -89,4 +89,26 @@ contract("GenesisAvatar", function (accounts) {
     const maxSupply = (await ga.maxSupply()).toNumber();
     assert.equal(totalSupply, maxSupply, "There are not "+totalSupply+" NFTs totally");
   });
+
+  it("It should withdraw all the coin of the contract", async function () {
+    // Setup owner
+    owner = accounts[0];
+
+    // Setup accounts.
+    const account1 = accounts[1];
+    const account9 = accounts[9];
+
+    // Fail to withdraw
+    await throwCatch.expectRevert(
+      ga.withdraw(account9, {from: account9})
+    );
+    
+    // Succeed in withdrawing
+    let totalAmount = web3.utils.toBN(await tt.balanceOf(ga.address));
+    let oldAmountOfAccount9 = web3.utils.toBN(await tt.balanceOf(account9));
+    await ga.withdraw(account9, {from: owner})
+    let newAmountOfAccount9 = web3.utils.toBN(await tt.balanceOf(account9));
+    let withdrawAmount = newAmountOfAccount9.sub(oldAmountOfAccount9)
+    assert.equal(withdrawAmount.toString(), totalAmount.toString(), "It should withdraw totally "+totalAmount);
+  });
 });
