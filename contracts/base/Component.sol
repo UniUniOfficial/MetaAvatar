@@ -17,7 +17,7 @@ abstract contract Component is ERC721, ERC721Enumerable, EIP712, Ownable {
     uint public maxSupply;
 
     // the token (ERC20 or Local coin) to mint
-    address public immutable acceptToken;    
+    address public immutable acceptToken;
 
     // the price to mint
     uint256 public immutable mintPrice;
@@ -27,7 +27,7 @@ abstract contract Component is ERC721, ERC721Enumerable, EIP712, Ownable {
 
     constructor(string memory name, string memory symbol, uint maxToken, address token, uint256 price)
         ERC721(name, symbol)
-        EIP712(name, "1.0.0") 
+        EIP712(name, "1.0.0")
     {
         maxSupply = maxToken;
         acceptToken = token;
@@ -40,16 +40,16 @@ abstract contract Component is ERC721, ERC721Enumerable, EIP712, Ownable {
         _safeMint(to, tokenId);
     }
 
-    function mintPublic(address to) external payable {
+    function mintPublic() external payable {
         if (acceptToken == address(0)) {
             require(msg.value == mintPrice, "Mint: Not enough payment to mint");
         } else {
-            IERC20(acceptToken).transfer(address(this), mintPrice);
+            IERC20(acceptToken).transferFrom(_msgSender(), address(this), mintPrice);
         }
 
         _tokenIdCounter.increment();
         uint256 tokenId = _tokenIdCounter.current();
-        _safeMint(to, tokenId);
+        _safeMint(_msgSender(), tokenId);
     }
 
     function airdrop(address to, uint256 tokenId, bytes calldata signature) external {
