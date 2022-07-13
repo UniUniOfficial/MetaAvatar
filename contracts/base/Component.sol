@@ -52,7 +52,7 @@ abstract contract Component is ERC721, ERC721Enumerable, EIP712, Ownable {
         _safeMint(_msgSender(), tokenId);
     }
 
-    function airdrop(address to, uint256 tokenId, bytes calldata signature) external {
+    function mintAirdrop(address to, uint256 tokenId, bytes calldata signature) external {
         require(_verify(_hash(to, tokenId), signature), "Airdrop: Invalid signature");
         _safeMint(to, tokenId);
     }

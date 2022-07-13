@@ -113,4 +113,32 @@ contract("GenesisAvatar", function (accounts) {
     const totalSupply = (await ga.totalSupply()).toNumber();
     assert.equal(totalSupply, 7, "It doesn't have 7 NFTs totally");
   });
+
+  it("It should fail to exceed 10 avatars", async function () {
+    // Setup owner
+    owner = accounts[0];
+
+    // Setup accounts.
+    const account1 = accounts[1];
+    const account2 = accounts[2];
+    const account3 = accounts[3];
+
+    // Fail to mint without paying
+    await ga.mintPublic({from: account1, value: price});
+    await ga.mintPublic({from: account2, value: price});
+    await ga.mintPublic({from: account3, value: price});
+    
+    await throwCatch.expectRevert(
+      ga.mint(account1, {from: owner})
+    );
+
+    await throwCatch.expectRevert(
+      ga.mintPublic({from: account1, value: price})
+    );
+
+    // Check the contract state
+    const totalSupply = (await ga.totalSupply()).toNumber();
+    const maxSupply = (await ga.maxSupply()).toNumber();
+    assert.equal(totalSupply, maxSupply, "There are "+ maxSupply +" NFTs totally");
+  });
 });
