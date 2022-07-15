@@ -7,7 +7,9 @@ import "./base/Component.sol";
 
 contract GenesisAvatar is Component {
     constructor(uint maxSupply, address token, uint256 price) 
-        Component("UniUni Genesis Avatar", "UUGA", maxSupply, token, price) {
+        Component("UniUni Genesis Avatar", "UUGA", maxSupply, token, price) 
+    {
+        mintSigner = owner();
     }
 
     /**

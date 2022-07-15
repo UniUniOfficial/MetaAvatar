@@ -8,11 +8,18 @@ import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
 import "@openzeppelin/contracts/utils/cryptography/draft-EIP712.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
+import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
 
 
 abstract contract Component is ERC721, ERC721Enumerable, EIP712, Ownable {
     using Counters for Counters.Counter;
     Counters.Counter private _tokenIdCounter;
+
+    // Keep airdrop secure
+    address public mintSigner;
+
+    // Mapping nonce used, avoid replay attacks
+    mapping(uint64 => bool) private _usedMintNonce;
 
     uint public maxSupply;
 
@@ -52,8 +59,13 @@ abstract contract Component is ERC721, ERC721Enumerable, EIP712, Ownable {
         _safeMint(_msgSender(), tokenId);
     }
 
-    function mintAirdrop(address to, uint256 tokenId, bytes calldata signature) external {
-        require(_verify(_hash(to, tokenId), signature), "Airdrop: Invalid signature");
+    function mintAirdrop(address to, uint64 expires, uint64 nonce, bytes calldata signature) external {
+        require(!_usedMintNonce[nonce], "Airdrop: Nonce is used");
+        require(_verify(_hash(to, expires, nonce), signature), "Airdrop: Invalid signature");
+        
+        _usedMintNonce[nonce] = true;
+        _tokenIdCounter.increment();
+        uint256 tokenId = _tokenIdCounter.current();
         _safeMint(to, tokenId);
     }
 
@@ -77,16 +89,16 @@ abstract contract Component is ERC721, ERC721Enumerable, EIP712, Ownable {
         }
     }
 
-    function _hash(address to, uint256 tokenId) internal view returns (bytes32) {
-        return _hashTypedDataV4(keccak256(abi.encode(
-            keccak256("Airdrop(address account, uint256 tokenId)"),
-            tokenId,
-            to
-        )));
+    function setMintSigner(address signer) external onlyOwner {
+        mintSigner = signer;
+    }
+
+    function _hash(address account, uint64 expires, uint64 nonce) internal pure returns (bytes32) {
+        return ECDSA.toEthSignedMessageHash(keccak256(abi.encodePacked(account, expires, nonce)));
     }
 
     function _verify(bytes32 digest, bytes memory signature) internal view returns (bool) {
-        return owner() == ECDSA.recover(digest, signature);
+        return mintSigner == ECDSA.recover(digest, signature);
     }
 
     /**
