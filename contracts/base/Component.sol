@@ -62,6 +62,7 @@ abstract contract Component is ERC721, ERC721Enumerable, EIP712, Ownable {
     function mintAirdrop(address to, uint64 expires, uint64 nonce, bytes calldata signature) external {
         require(!_usedMintNonce[nonce], "Airdrop: Nonce is used");
         require(_verify(_hash(to, expires, nonce), signature), "Airdrop: Invalid signature");
+        require(msg.sender == to, "Airdrop: Only white list users can mint");
         
         _usedMintNonce[nonce] = true;
         _tokenIdCounter.increment();
@@ -106,7 +107,7 @@ abstract contract Component is ERC721, ERC721Enumerable, EIP712, Ownable {
      */
     function _safeMint(address to, uint256 tokenId) internal override virtual {
         require(mintPermitted, "Mint: No NFT is allowed to mint");
-        require(tokenId <= maxSupply, "Mint: total supply of NFTs is reached to max supply limit");
+        require(tokenId <= maxSupply, "Mint: Total supply of NFTs is reached to max supply limit");
         super._safeMint(to, tokenId);
     }
 

@@ -4,6 +4,13 @@ const timeHelper = require('./helper/time.js');
 const GenesisAvatar = artifacts.require("GenesisAvatar");
 const TestToken = artifacts.require("TestToken");
 
+function hashAndSign(data) {
+  return web3.eth.accounts.sign(
+    web3.utils.keccak256(data), 
+    "766a75d6b54a93d1f254d574b983117236dc8f1bd6d75ac00c549343405ab9cd"
+  )['signature'];
+}
+
 /*
  * uncomment accounts to access the test accounts made available by the
  * Ethereum client
@@ -23,7 +30,7 @@ contract("GenesisAvatar", function (accounts) {
     ga = await GenesisAvatar.new(max_supply, token_address, price);
   });
 
-  it("It should airdrop 3 avatar", async function () {
+  it("It should airdrop 3 avatars", async function () {
     // Setup owner
     owner = accounts[0];
 
@@ -40,14 +47,40 @@ contract("GenesisAvatar", function (accounts) {
       {value: expires, type: "uint64"},
       {value: nonce, type: "uint64"},
     );
-    let hash = await web3.utils.keccak256(data);
-    let sig = await web3.eth.accounts.sign(hash, "766a75d6b54a93d1f254d574b983117236dc8f1bd6d75ac00c549343405ab9cd")['signature'];
+    let sig = hashAndSign(data);
 
     await ga.mintAirdrop(account1, expires, nonce, sig, {from: account1});
     const account1_nft_num = (await ga.balanceOf(account1)).toNumber();
     assert.equal(account1_nft_num, 1, "It doesn't mint 1 NFT of "+account1);
     
     // avoid replay attack
-    //await ga.mintAirdrop(account1, expires, nonce, sig, {from: account1});
+    await throwCatch.expectRevert(
+      ga.mintAirdrop(account1, expires, nonce, sig, {from: account1})
+    );
+
+    // avoid account-spoofing attack
+    expires = timeHelper.getTimestampInSeconds() + 3600;
+    nonce = 2;
+    data = await web3.utils.encodePacked(
+      {value: account1, type: "address"},
+      {value: expires, type: "uint64"},
+      {value: nonce, type: "uint64"},
+    );
+    sig = hashAndSign(data);
+    await throwCatch.expectRevert(
+      ga.mintAirdrop(account2, expires, nonce, sig, {from: account1})
+    )
+    await throwCatch.expectRevert(
+      ga.mintAirdrop(account2, expires, nonce, sig, {from: account2})
+    );
+    await throwCatch.expectRevert(
+      ga.mintAirdrop(account1, expires, nonce, sig, {from: account2})
+    );
+
+    await ga.mint(account1, {from: owner});
+    await ga.mint(account1, {from: owner});
+    // Check the contract state
+    const totalSupply = (await ga.totalSupply()).toNumber();
+    assert.equal(totalSupply, 3, "It doesn't have 3 NFTs totally");
   });
 });
