@@ -4,10 +4,10 @@ const timeHelper = require('./helper/time.js');
 const GenesisAvatar = artifacts.require("GenesisAvatar");
 const TestToken = artifacts.require("TestToken");
 
-function hashAndSign(data) {
+function hashAndSign(data, signer) {
   return web3.eth.accounts.sign(
     web3.utils.keccak256(data), 
-    "766a75d6b54a93d1f254d574b983117236dc8f1bd6d75ac00c549343405ab9cd"
+    signer.privateKey
   )['signature'];
 }
 
@@ -34,6 +34,11 @@ contract("GenesisAvatar", function (accounts) {
     // Setup owner
     owner = accounts[0];
 
+    // Setup signer;
+    await web3.eth.accounts.wallet.create(1);
+    const signer = web3.eth.accounts.wallet[0];
+    await ga.setMintSigner(signer.address);
+
     // Setup accounts.
     const account1 = accounts[1];
     const account2 = accounts[2];
@@ -47,7 +52,7 @@ contract("GenesisAvatar", function (accounts) {
       {value: expires, type: "uint64"},
       {value: nonce, type: "uint64"},
     );
-    let sig = hashAndSign(data);
+    let sig = hashAndSign(data, signer);
 
     await ga.mintAirdrop(account1, expires, nonce, sig, {from: account1});
     const account1_nft_num = (await ga.balanceOf(account1)).toNumber();
@@ -66,7 +71,7 @@ contract("GenesisAvatar", function (accounts) {
       {value: expires, type: "uint64"},
       {value: nonce, type: "uint64"},
     );
-    sig = hashAndSign(data);
+    sig = hashAndSign(data, signer);
     await throwCatch.expectRevert(
       ga.mintAirdrop(account2, expires, nonce, sig, {from: account1})
     )
@@ -77,8 +82,24 @@ contract("GenesisAvatar", function (accounts) {
       ga.mintAirdrop(account1, expires, nonce, sig, {from: account2})
     );
 
-    await ga.mint(account1, {from: owner});
-    await ga.mint(account1, {from: owner});
+    nonce = 2;
+    data = await web3.utils.encodePacked(
+      {value: account2, type: "address"},
+      {value: expires, type: "uint64"},
+      {value: nonce, type: "uint64"},
+    );
+    sig = hashAndSign(data, signer);
+    await ga.mintAirdrop(account2, expires, nonce, sig, {from: account2});
+
+    nonce = 3;
+    data = await web3.utils.encodePacked(
+      {value: account3, type: "address"},
+      {value: expires, type: "uint64"},
+      {value: nonce, type: "uint64"},
+    );
+    sig = hashAndSign(data, signer);
+    await ga.mintAirdrop(account3, expires, nonce, sig, {from: account3});
+
     // Check the contract state
     const totalSupply = (await ga.totalSupply()).toNumber();
     assert.equal(totalSupply, 3, "It doesn't have 3 NFTs totally");
