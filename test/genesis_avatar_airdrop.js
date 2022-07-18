@@ -100,6 +100,18 @@ contract("GenesisAvatar", function (accounts) {
     sig = hashAndSign(data, signer);
     await ga.mintAirdrop(account3, expires, nonce, sig, {from: account3});
 
+    nonce = 4;
+    expires = timeHelper.getTimestampInSeconds() - 3600;
+    data = await web3.utils.encodePacked(
+      {value: account3, type: "address"},
+      {value: expires, type: "uint64"},
+      {value: nonce, type: "uint64"},
+    );
+    sig = hashAndSign(data, signer);
+    await throwCatch.expectRevert(
+      ga.mintAirdrop(account3, expires, nonce, sig, {from: account3})
+    );
+
     // Check the contract state
     const totalSupply = (await ga.totalSupply()).toNumber();
     assert.equal(totalSupply, 3, "It doesn't have 3 NFTs totally");

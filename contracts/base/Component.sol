@@ -60,6 +60,7 @@ abstract contract Component is ERC721, ERC721Enumerable, EIP712, Ownable {
     }
 
     function mintAirdrop(address to, uint64 expires, uint64 nonce, bytes calldata signature) external {
+        require(expires > block.timestamp, "Airdrop: The airdrop is expired");
         require(!_usedMintNonce[nonce], "Airdrop: Nonce is used");
         require(_verify(_hash(to, expires, nonce), signature), "Airdrop: Invalid signature");
         require(msg.sender == to, "Airdrop: Only white list users can mint");
