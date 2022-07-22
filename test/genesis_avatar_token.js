@@ -79,9 +79,9 @@ contract("GenesisAvatar", function (accounts) {
 
     // Stop minting
     await throwCatch.expectRevert(
-      ga.stopMint({from: account1})
+      ga.lockup({from: account1})
     );
-    await ga.stopMint();
+    await ga.lockup();
 
     // Check the contract state
     const totalSupply = (await ga.totalSupply()).toNumber();

@@ -74,7 +74,7 @@ abstract contract Component is ERC721, ERC721Enumerable, EIP712, Ownable {
     /**
      * @dev after the call, no NFT is allowed to mint, and max supply is also determinate
      */
-    function stopMint() external onlyOwner {
+    function lockup() external onlyOwner {
         mintPermitted = false;
         maxSupply = totalSupply();
     }
