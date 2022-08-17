@@ -24,10 +24,10 @@ abstract contract Component is ERC721, ERC721Enumerable, Ownable {
     uint public maxSupply;
 
     // the token (ERC20 or Local coin) to mint
-    address public immutable acceptToken;
+    address public acceptToken;
 
     // the price to mint
-    uint256 public immutable mintPrice;
+    uint256 public mintPrice;
 
     // the mint status, if false, no any nft is allowed to mint
     bool public mintPermitted = true;
@@ -88,6 +88,11 @@ abstract contract Component is ERC721, ERC721Enumerable, Ownable {
                 IERC20(acceptToken).balanceOf(address(this))
             );
         }
+    }
+
+    function setMintPrice(address token, uint256 price) external onlyOwner {
+        acceptToken = token;
+        mintPrice = price;
     }
 
     function setMintSigner(address signer) external onlyOwner {
