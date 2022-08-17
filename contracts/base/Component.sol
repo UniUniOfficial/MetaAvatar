@@ -11,7 +11,7 @@ import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
 
 
-abstract contract Component is ERC721, ERC721Enumerable, EIP712, Ownable {
+abstract contract Component is ERC721, ERC721Enumerable, Ownable {
     using Counters for Counters.Counter;
     Counters.Counter private _tokenIdCounter;
 
@@ -34,7 +34,6 @@ abstract contract Component is ERC721, ERC721Enumerable, EIP712, Ownable {
 
     constructor(string memory name, string memory symbol, uint maxToken, address token, uint256 price)
         ERC721(name, symbol)
-        EIP712(name, "1.0.0")
     {
         maxSupply = maxToken;
         acceptToken = token;
