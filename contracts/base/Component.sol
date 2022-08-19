@@ -47,7 +47,7 @@ abstract contract Component is ERC721, ERC721Enumerable, Ownable {
 
     function mintPublic() external payable {
         if (acceptToken == address(0)) {
-            require(msg.value == mintPrice, "Mint: Not enough payment to mint");
+            require(msg.value >= mintPrice, "Mint: Not enough payment to mint");
         } else {
             IERC20(acceptToken).transferFrom(_msgSender(), address(this), mintPrice);
         }
