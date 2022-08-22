@@ -20,6 +20,7 @@ abstract contract Component is ERC721, ERC721Enumerable, Ownable {
     // Mapping nonce used, avoid replay attacks
     mapping(uint64 => bool) private _usedMintNonce;
 
+    // Token Cap
     uint public maxSupply;
 
     // the token (ERC20 or Local coin) to mint
@@ -31,12 +32,12 @@ abstract contract Component is ERC721, ERC721Enumerable, Ownable {
     // the mint status, if false, no any nft is allowed to mint
     bool public mintPermitted = true;
 
-    constructor(string memory name, string memory symbol, uint maxToken, address token, uint256 price)
+    constructor(string memory name, string memory symbol, uint _maxSupply, address _acceptToken, uint256 _mintPrice)
         ERC721(name, symbol)
     {
-        maxSupply = maxToken;
-        acceptToken = token;
-        mintPrice = price;
+        maxSupply = _maxSupply;
+        acceptToken = _acceptToken;
+        mintPrice = _mintPrice;
     }
 
     function mint(address to) external onlyOwner {
