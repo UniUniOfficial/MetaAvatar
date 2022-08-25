@@ -13,7 +13,9 @@ contract("GenesisAvatar", function (accounts) {
   const max_supply = 10;
   const token_address = "0x0000000000000000000000000000000000000000";
   const price = web3.utils.toBN('1000000000000000000');
-  
+  // Setup owner
+  owner = accounts[0];
+
   let ga;
 
   before(async () => {
@@ -21,9 +23,6 @@ contract("GenesisAvatar", function (accounts) {
   });
 
   it("It should read info of Genesis Avatar", async function () {
-    // Setup owner
-    owner = accounts[0];
-
     // Check the contract state
     const supply = (await ga.maxSupply()).toNumber();
     assert.equal(supply, max_supply, "Max supply should be "+max_supply);
@@ -36,9 +35,6 @@ contract("GenesisAvatar", function (accounts) {
   });
 
   it("It should mint 4 avatar by owner", async function () {
-    // Setup owner
-    owner = accounts[0];
-
     // Setup accounts.
     const account1 = accounts[1];
     const account2 = accounts[2];
@@ -73,9 +69,6 @@ contract("GenesisAvatar", function (accounts) {
   });
 
   it("It should mint 3 avatar by other addresses paying the coin of the blockchain", async function () {
-    // Setup owner
-    owner = accounts[0];
-
     // Setup accounts.
     const account1 = accounts[1];
     const account2 = accounts[2];
@@ -115,9 +108,6 @@ contract("GenesisAvatar", function (accounts) {
   });
 
   it("It should fail to exceed 10 avatars", async function () {
-    // Setup owner
-    owner = accounts[0];
-
     // Setup accounts.
     const account1 = accounts[1];
     const account2 = accounts[2];
@@ -143,9 +133,6 @@ contract("GenesisAvatar", function (accounts) {
   });
 
   it("It should withdraw all the coin of the contract", async function () {
-    // Setup owner
-    owner = accounts[0];
-
     // Setup accounts.
     const account1 = accounts[1];
     const account9 = accounts[9];

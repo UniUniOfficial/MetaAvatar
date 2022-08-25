@@ -13,6 +13,8 @@ contract("GenesisAvatar", function (accounts) {
   const max_supply = 1000;
   let token_address = "";
   const price = web3.utils.toBN("1000000000000000000");
+  // Setup owner
+  owner = accounts[0];
 
   let ga;
   let tt
@@ -24,9 +26,6 @@ contract("GenesisAvatar", function (accounts) {
   });
 
   it("It should mint 3 avatar by other addresses paying the ERC20 token", async function () {
-    // Setup owner
-    owner = accounts[0];
-
     // Setup accounts.
     const account1 = accounts[1];
     const account2 = accounts[2];
@@ -71,9 +70,6 @@ contract("GenesisAvatar", function (accounts) {
   });
 
   it("It should stop and determine the max supply", async function () {
-    // Setup owner
-    owner = accounts[0];
-
     // Setup accounts.
     const account1 = accounts[1];
 
@@ -90,9 +86,6 @@ contract("GenesisAvatar", function (accounts) {
   });
 
   it("It should withdraw all the coin of the contract", async function () {
-    // Setup owner
-    owner = accounts[0];
-
     // Setup accounts.
     const account1 = accounts[1];
     const account9 = accounts[9];

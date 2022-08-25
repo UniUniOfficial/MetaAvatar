@@ -13,6 +13,8 @@ contract("GenesisAvatar", function (accounts) {
   const max_supply = 1000;
   let token_address = "";
   const price = web3.utils.toBN("1000000000000000000");
+  // Setup owner
+  owner = accounts[0];
 
   let ga;
   let tt
@@ -24,9 +26,6 @@ contract("GenesisAvatar", function (accounts) {
   });
 
   it("It should pay and mint nft by local coin", async function () {
-    // Setup owner
-    owner = accounts[0];
-
     // Setup accounts.
     const account1 = accounts[1];
 
