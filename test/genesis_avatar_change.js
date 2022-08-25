@@ -22,7 +22,7 @@ contract("GenesisAvatar", function (accounts) {
   before(async () => {
     tt = await TestToken.new();
     token_address = tt.address;
-    ga = await GenesisAvatar.new(max_supply, token_address, price);
+    ga = await GenesisAvatar.new(owner, max_supply, token_address, price);
   });
 
   it("It should pay and mint nft by local coin", async function () {
