@@ -20,22 +20,47 @@ contract("GenesisAvatar", function (accounts) {
   const max_supply = 1000;
   let token_address = "";
   const price = web3.utils.toBN("1000000000000000000");
-  // Setup owner
-  owner = accounts[0];
+  
+  // Setup first and sencond signer
+  web3.eth.accounts.wallet.create(2);
+  const signer1 = web3.eth.accounts.wallet[0];
+  const signer2 = web3.eth.accounts.wallet[1];
 
   let ga;
-  let tt
+  let tt;
   
   before(async () => {
     tt = await TestToken.new();
     token_address = tt.address;
-    ga = await GenesisAvatar.new(owner, max_supply, token_address, price);
+    ga = await GenesisAvatar.new(signer1.address, max_supply, token_address, price);
+  });
+
+  it("It should airdrop 1 avatar", async function () {
+    // Setup accounts.
+    const account = accounts[4];
+
+    // Succeed in airdrop a avatar
+    let expires = timeHelper.getTimestampInSeconds() + 3600;
+    let nonce = 0;
+    let data = await web3.utils.encodePacked(
+      {value: account, type: "address"},
+      {value: expires, type: "uint64"},
+      {value: nonce, type: "uint64"},
+    );
+    let sig = hashAndSign(data, signer1);
+
+    await ga.mintAirdrop(account, expires, nonce, sig, {from: account});
+    const account_nft_num = (await ga.balanceOf(account)).toNumber();
+    assert.equal(account_nft_num, 1, "It doesn't mint 1 NFT of "+account);
+    
+    // Check the contract state
+    const totalSupply = (await ga.totalSupply()).toNumber();
+    assert.equal(totalSupply, 1, "It doesn't have 1 NFTs totally");
   });
 
   it("It should airdrop 3 avatars", async function () {
     // Setup signer;
-    await web3.eth.accounts.wallet.create(1);
-    const signer = web3.eth.accounts.wallet[0];
+    const signer = signer2
     await ga.setMintSigner(signer.address);
 
     // Setup accounts.
@@ -113,6 +138,6 @@ contract("GenesisAvatar", function (accounts) {
 
     // Check the contract state
     const totalSupply = (await ga.totalSupply()).toNumber();
-    assert.equal(totalSupply, 3, "It doesn't have 3 NFTs totally");
+    assert.equal(totalSupply, 4, "It doesn't have 4 NFTs totally");
   });
 });

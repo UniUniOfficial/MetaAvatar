@@ -17,7 +17,7 @@ contract("GenesisAvatar", function (accounts) {
   owner = accounts[0];
 
   let ga;
-  let tt
+  let tt;
   
   before(async () => {
     tt = await TestToken.new();
