@@ -151,7 +151,12 @@ contract("GenesisAvatar", function (accounts) {
     const account2 = accounts[2];
     const account3 = accounts[3];
 
-    // Succeed in minting 
+    // Fail to set phrase cap
+    await throwCatch.expectRevert(
+      ga.setPhraseSupply(max_supply + 1)
+    );
+
+    // Succeed in setting phrase cap
     await ga.setPhraseSupply(currentPhraseCap);
     await ga.mint(owner, {from: owner});
     
