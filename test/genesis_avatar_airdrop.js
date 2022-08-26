@@ -32,7 +32,7 @@ contract("GenesisAvatar", function (accounts) {
   before(async () => {
     tt = await TestToken.new();
     token_address = tt.address;
-    ga = await GenesisAvatar.new(signer1.address, max_supply, token_address, price);
+    ga = await GenesisAvatar.new(signer1.address, max_supply, token_address, price, max_supply);
   });
 
   it("It should airdrop 1 avatar", async function () {

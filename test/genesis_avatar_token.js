@@ -22,7 +22,7 @@ contract("GenesisAvatar", function (accounts) {
   before(async () => {
     tt = await TestToken.new();
     token_address = tt.address;
-    ga = await GenesisAvatar.new(owner, max_supply, token_address, price);
+    ga = await GenesisAvatar.new(owner, max_supply, token_address, price, max_supply);
   });
 
   it("It should mint 3 avatar by other addresses paying the ERC20 token", async function () {

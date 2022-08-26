@@ -19,7 +19,7 @@ contract("GenesisAvatar", function (accounts) {
   let ga;
 
   before(async () => {
-    ga = await GenesisAvatar.new(owner, max_supply, token_address, price);
+    ga = await GenesisAvatar.new(owner, max_supply, token_address, price, max_supply);
   });
 
   it("It should read info of Genesis Avatar", async function () {

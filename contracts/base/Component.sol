@@ -20,8 +20,11 @@ abstract contract Component is ERC721, ERC721Enumerable, Ownable {
     // Mapping nonce used, avoid replay attacks
     mapping(uint64 => bool) private _usedMintNonce;
 
-    // Token Cap
+    // Token MaxCap
     uint public maxSupply;
+
+    // Phrase SupplyCap
+    uint private currentPhraseSupply;
 
     // the token (ERC20 or Local coin) to mint
     address public acceptToken;
@@ -32,12 +35,13 @@ abstract contract Component is ERC721, ERC721Enumerable, Ownable {
     // the mint status, if false, no any nft is allowed to mint
     bool public mintPermitted = true;
 
-    constructor(string memory name, string memory symbol, uint _maxSupply, address _acceptToken, uint256 _mintPrice)
+    constructor(string memory name, string memory symbol, uint _maxSupply, address _acceptToken, uint256 _mintPrice, uint firstPhraseSupply)
         ERC721(name, symbol)
     {
         maxSupply = _maxSupply;
         acceptToken = _acceptToken;
         mintPrice = _mintPrice;
+        currentPhraseSupply = firstPhraseSupply;
     }
 
     function mint(address to) external onlyOwner {
@@ -78,6 +82,11 @@ abstract contract Component is ERC721, ERC721Enumerable, Ownable {
         maxSupply = totalSupply();
     }
 
+    function setPhraseSupply(uint supply) external onlyOwner {
+        require(supply <= maxSupply, "PhraseSupply: invalid supply number");
+        currentPhraseSupply = supply;
+    }
+
     function withdraw(address withdrawAddress) external onlyOwner {
         require(withdrawAddress != address(0), "Withdraw: No withdraw address");
         if (acceptToken == address(0)) {
@@ -112,6 +121,7 @@ abstract contract Component is ERC721, ERC721Enumerable, Ownable {
      */
     function _safeMint(address to, uint256 tokenId) internal override virtual {
         require(mintPermitted, "Mint: No NFT is allowed to mint");
+        require(tokenId <= currentPhraseSupply, "Mint: Reach the current supply limit");
         require(tokenId <= maxSupply, "Mint: Total supply of NFTs is reached to max supply limit");
         super._safeMint(to, tokenId);
     }
