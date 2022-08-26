@@ -120,8 +120,8 @@ abstract contract Component is ERC721, ERC721Enumerable, Ownable {
      */
     function _safeMint(address to, uint256 tokenId) internal override virtual {
         require(mintPermitted, "Mint: No NFT is allowed to mint");
-        require(tokenId <= currentPhraseSupply, "Mint: Reach the current supply limit");
         require(tokenId <= maxSupply, "Mint: Total supply of NFTs is reached to max supply limit");
+        require(tokenId <= currentPhraseSupply, "Mint: Reach the current supply limit");
         super._safeMint(to, tokenId);
     }
 
