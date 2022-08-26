@@ -83,7 +83,6 @@ abstract contract Component is ERC721, ERC721Enumerable, Ownable {
     }
 
     function setPhraseSupply(uint supply) external onlyOwner {
-        require(supply <= maxSupply, "PhraseSupply: invalid supply number");
         currentPhraseSupply = supply;
     }
 
