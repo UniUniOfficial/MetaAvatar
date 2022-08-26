@@ -18,20 +18,19 @@ function hashAndSign(data, signer) {
  */
 contract("GenesisAvatar", function (accounts) {
   const max_supply = 1000;
-  let token_address = "";
+  const token_address = "0x0000000000000000000000000000000000000000";
   const price = web3.utils.toBN("1000000000000000000");
-  
+  // Setup owner
+  owner = accounts[0];
+
   // Setup first and sencond signer
   web3.eth.accounts.wallet.create(2);
   const signer1 = web3.eth.accounts.wallet[0];
   const signer2 = web3.eth.accounts.wallet[1];
 
   let ga;
-  let tt;
   
   before(async () => {
-    tt = await TestToken.new();
-    token_address = tt.address;
     ga = await GenesisAvatar.new(signer1.address, max_supply, token_address, price, max_supply);
   });
 
@@ -139,5 +138,46 @@ contract("GenesisAvatar", function (accounts) {
     // Check the contract state
     const totalSupply = (await ga.totalSupply()).toNumber();
     assert.equal(totalSupply, 4, "It doesn't have 4 NFTs totally");
+  });
+
+  it("It should not mint any avatars after excceeding the phrase cap", async function () {
+    // Setup signer;
+    const currentPhraseCap = 5;
+    const signer = signer2;
+    await ga.setMintSigner(signer.address);
+
+    // Setup accounts.
+    const account1 = accounts[1];
+    const account2 = accounts[2];
+    const account3 = accounts[3];
+
+    // Succeed in minting 
+    await ga.setPhraseSupply(currentPhraseCap);
+    await ga.mint(owner, {from: owner});
+    
+    // Fail to mint any nfts 
+    await throwCatch.expectRevert(
+      ga.mint(account1, {from: owner})
+    );
+
+    await throwCatch.expectRevert(
+      ga.mintPublic({from: account2, value: price})
+    );
+    
+    nonce = 5;
+    expires = timeHelper.getTimestampInSeconds() + 3600;
+    data = await web3.utils.encodePacked(
+      {value: account3, type: "address"},
+      {value: expires, type: "uint64"},
+      {value: nonce, type: "uint64"},
+    );
+    sig = hashAndSign(data, signer);
+    await throwCatch.expectRevert(
+      ga.mintAirdrop(account3, expires, nonce, sig, {from: account3})
+    );
+
+    // Check the contract state
+    const totalSupply = (await ga.totalSupply()).toNumber();
+    assert.equal(totalSupply, currentPhraseCap, "It doesn't have " + currentPhraseCap + " NFTs totally");
   });
 });
