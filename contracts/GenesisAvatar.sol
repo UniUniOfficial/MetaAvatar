@@ -10,12 +10,6 @@ contract GenesisAvatar is Component {
         Component("UniUni Genesis Avatar", "UGA", maxSupply, token, price, firstPhraseSupply) 
     {
         mintSigner = minter;
-    }
-
-    /**
-     * @dev overrides Base URI for computing {tokenURI}.
-     */
-    function _baseURI() internal view virtual override(ERC721) returns (string memory) {
-        return "https://uniuni.io/nft/genesisavatar/";
+        setBaseURI("https://devnet.uniuni.io/nft/genesisavatar/");
     }
 }

@@ -35,6 +35,9 @@ abstract contract Component is ERC721Enumerable, ERC721Burnable, Ownable {
     // the mint status, if false, no any nft is allowed to mint
     bool public mintPermitted = true;
 
+    // base uri
+    string private _tokenBaseURI;
+
     constructor(string memory name, string memory symbol, uint _maxSupply, address _acceptToken, uint256 _mintPrice, uint firstPhraseSupply)
         ERC721(name, symbol)
     {
@@ -113,6 +116,20 @@ abstract contract Component is ERC721Enumerable, ERC721Burnable, Ownable {
 
     function _verify(bytes32 digest, bytes memory signature) internal view returns (bool) {
         return mintSigner == ECDSA.recover(digest, signature);
+    }
+
+    /**
+     * @dev Set Base URI for computing {tokenURI}.
+     */
+    function setBaseURI(string memory uri) public onlyOwner {
+        _tokenBaseURI = uri;
+    }
+
+    /**
+     * @dev Base URI for computing {tokenURI}.
+     */
+    function _baseURI() internal view override virtual returns (string memory) {
+        return _tokenBaseURI;
     }
 
     /**
