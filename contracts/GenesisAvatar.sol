@@ -7,9 +7,8 @@ import "./base/Component.sol";
 
 contract GenesisAvatar is Component {
     constructor(address minter, uint maxSupply, address token, uint256 price, uint firstPhraseSupply) 
-        Component("UniUni Genesis Avatar", "UGA", maxSupply, token, price, firstPhraseSupply) 
+        Component("UniUni Genesis Avatar", "UGA", minter, maxSupply, token, price, firstPhraseSupply) 
     {
-        mintSigner = minter;
-        setBaseURI("https://devnet.uniuni.io/nft/genesisavatar/");
+        setBaseURI("https://uniuni.io/nft/genesisavatar/");
     }
 }

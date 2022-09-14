@@ -38,9 +38,10 @@ abstract contract Component is ERC721Enumerable, ERC721Burnable, Ownable {
     // base uri
     string private _tokenBaseURI;
 
-    constructor(string memory name, string memory symbol, uint _maxSupply, address _acceptToken, uint256 _mintPrice, uint firstPhraseSupply)
+    constructor(string memory name, string memory symbol,  address minter, uint _maxSupply, address _acceptToken, uint256 _mintPrice, uint firstPhraseSupply)
         ERC721(name, symbol)
     {
+        mintSigner = minter;
         maxSupply = _maxSupply;
         acceptToken = _acceptToken;
         mintPrice = _mintPrice;
