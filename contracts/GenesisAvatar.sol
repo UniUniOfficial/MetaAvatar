@@ -9,6 +9,6 @@ contract GenesisAvatar is Component {
     constructor(address minter, uint maxSupply, address token, uint256 price, uint firstPhraseSupply) 
         Component("UniUni Genesis Avatar", "UGA", minter, maxSupply, token, price, firstPhraseSupply) 
     {
-        setBaseURI("https://uniuni.io/nft/genesisavatar/");
+        setBaseURI("https://uniuni.network/nft/genesisavatar/");
     }
 }
